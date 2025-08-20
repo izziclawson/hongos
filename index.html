@@ -6,26 +6,23 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 600px;
+      max-width: 700px;
       margin: 2rem auto;
       padding: 1rem;
-      background: #fdfcf7;
-      color: #222;
+      background: #1e1e1e;
+      color: #eee;
     }
-    h1 {
-      text-align: center;
-    }
-    .section {
-      margin: 1rem 0;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-    }
+    h1, h3 { text-align: center; color: #90ee90; }
+    .section { margin: 1.5rem 0; }
+    label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
     select, input, button {
       width: 100%;
       padding: 0.5rem;
       margin-bottom: 1rem;
+      background: #2b2b2b;
+      border: 1px solid #444;
+      color: #eee;
+      border-radius: 6px;
     }
     button {
       background: #4caf50;
@@ -33,129 +30,38 @@
       border: none;
       cursor: pointer;
     }
-    button:hover {
-      background: #45a049;
-    }
+    button:hover { background: #45a049; }
     .result {
-      background: #fff;
-      border: 1px solid #ccc;
+      background: #2b2b2b;
+      border: 1px solid #444;
       padding: 1rem;
       border-radius: 6px;
     }
+    .advice { margin-top: 1rem; }
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .toggle { display: inline-block; margin: 0 0.5rem; cursor: pointer; }
   </style>
 </head>
 <body>
   <h1>🍄 Shroomies Dose Calculator</h1>
-  <p>Calculate appropriate mushroom doses based on body weight, desired experience level, and strain potency.<br>
-  <strong>⚠️ Educational use only.</strong></p>
-
-  <div class="section">
-    <label for="weight">Body Weight (kg):</label>
-    <input type="number" id="weight" placeholder="Enter your weight in kg">
+  <div style="text-align:center; margin-bottom:1rem;">
+    <span class="toggle" onclick="setLanguage('en')">🇺🇸 English</span> | 
+    <span class="toggle" onclick="setLanguage('es')">🇵🇷 Español</span>
   </div>
 
   <div class="section">
-    <label for="strain">Strain:</label>
-    <select id="strain"></select>
+    <label id="weightLabel">Body Weight</label>
+    <input type="number" id="weight" placeholder="Enter your weight">
+    <div>
+      <label><input type="radio" name="unit" value="kg" checked> kg</label>
+      <label><input type="radio" name="unit" value="lb"> lb</label>
+    </div>
   </div>
 
   <div class="section">
-    <label for="experience">Experience Level:</label>
-    <select id="experience">
-      <option value="micro">Microdose</option>
-      <option value="light">Light</option>
-      <option value="common">Common</option>
-      <option value="strong">Strong</option>
-      <option value="heroic">Heroic</option>
-    </select>
-  </div>
-
-  <button onclick="calculateDose()">Calculate Dose</button>
-
-  <div id="output" class="result" style="display:none;"></div>
-
-  <script>
-    // Strain potency (mg psilocybin per gram dried weight)
-    const STRAIN_POTENCIES = {
-      "golden teacher": 6.0,
-      "b+": 5.5,
-      "penis envy": 11.0,
-      "albino penis envy": 12.0,
-      "liberty cap": 8.0,
-      "blue meanie": 9.0,
-      "mazatapec": 5.0,
-      "cambodian": 7.0,
-      "thai": 6.5,
-      "ecuador": 6.0,
-      "mexican": 5.5,
-      "hawaiian": 7.5,
-      "treasure coast": 6.5,
-      "amazon": 6.0,
-      "albino a+": 8.0,
-      "trinity": 10.0,
-      "tidal wave": 10.5,
-      "ghost": 7.5,
-      "jedi mind fuck": 8.5,
-      "white rabbit": 9.0,
-      "rusty whyte": 7.0,
-      "great white monster": 8.5,
-      "albino louisiana": 7.5,
-      "alcabenzi": 6.5,
-      "costa rican": 6.0,
-      "puerto rican": 7.0,
-      "orissa india": 7.0,
-      "pink buffalo": 6.5,
-      "redboy": 7.5,
-      "syzygy": 9.5,
-      "pf classic": 5.5,
-      "golden mammoth": 7.0
-    };
-
-    // Dose multipliers per experience level
-    const DOSE_LEVELS = {
-      micro: 0.1,
-      light: 0.5,
-      common: 1.0,
-      strong: 1.75,
-      heroic: 3.0
-    };
-
-    // Fill dropdown with strains
-    const strainSelect = document.getElementById("strain");
-    for (let strain in STRAIN_POTENCIES) {
-      let opt = document.createElement("option");
-      opt.value = strain;
-      opt.textContent = strain;
-      strainSelect.appendChild(opt);
-    }
-
-    function calculateDose() {
-      const weight = parseFloat(document.getElementById("weight").value);
-      const strain = document.getElementById("strain").value;
-      const experience = document.getElementById("experience").value;
-
-      if (!weight || weight <= 0) {
-        alert("Please enter a valid weight.");
-        return;
-      }
-
-      const potency = STRAIN_POTENCIES[strain];
-      const multiplier = DOSE_LEVELS[experience];
-
-      // Rough formula: base dose per kg * bodyweight / potency
-      const baseMgPerKg = 1.0; // educational estimate
-      const totalMg = weight * baseMgPerKg * multiplier;
-      const grams = totalMg / potency;
-
-      const output = document.getElementById("output");
-      output.style.display = "block";
-      output.innerHTML = `
-        <h3>Recommended Dose</h3>
-        <p><strong>${grams.toFixed(2)} g</strong> of dried <em>${strain}</em></p>
-        <p>(~${totalMg.toFixed(1)} mg psilocybin equivalent)</p>
-        <p><em>Experience level: ${experience}</em></p>
-      `;
-    }
-  </script>
-</body>
-</html>
+    <label id="stra
