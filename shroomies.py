@@ -1,200 +1,227 @@
-from colorama import Fore, Back, Style, init
-init(autoreset=True)
+"""
+Mushroom dose calculation logic
+Handles different mushroom types, strains, and dosage levels
+"""
 
-class MushroomDoseCalculator:
-    def __init__(self):
-        self.strain_groups = {
-            Fore.GREEN + 'Mild': {
-                'golden_teacher': 0.9,
-                'mazatapec': 0.7
-            },
-            Fore.YELLOW + 'Standard': {
-                'puerto_rican': 1.1,
-                'b+': 1.0
-            },
-            Fore.RED + 'Strong': {
-                'bluey_vuitton': 1.3,
-                'penis_envvy': 1.4
-            },
-            Fore.CYAN + 'Truffles': {
-                'atlantis': 0.55,
-                'dolphins_delight': 0.6,
-                'tampanensis': 0.5,
-                'mexicana': 0.45
-            }
-        }
+# Strain potency database (psilocybin content estimates in mg per gram dried weight)
+STRAIN_POTENCIES = {
+    # Popular strains with known potencies
+    'golden teacher': 6.0,
+    'b+': 5.5,
+    'penis envy': 11.0,
+    'albino penis envy': 12.0,
+    'liberty cap': 8.0,
+    'blue meanie': 9.0,
+    'mazatapec': 5.0,
+    'cambodian': 7.0,
+    'thai': 6.5,
+    'ecuador': 6.0,
+    'mexican': 5.5,
+    'hawaiian': 7.5,
+    'treasure coast': 6.5,
+    'amazon': 6.0,
+    'albino a+': 8.0,
+    'trinity': 10.0,
+    'tidal wave': 10.5,
+    'ghost': 7.5,
+    'jedi mind fuck': 8.5,
+    'white rabbit': 9.0,
+    'rusty whyte': 7.0,
+    'great white monster': 8.5,
+    'albino louisiana': 7.5,
+    'alcabenzi': 6.5,
+    'costa rican': 6.0,
+    'puerto rican': 7.0,
+    'orissa india': 7.0,
+    'pink buffalo': 6.5,
+    'redboy': 7.5,
+    'syzygy': 9.5,
+    'pf classic': 5.5,
+    'golden mammoth': 7.0,
+    'south african transkei': 8.0,
+    'mckennaii': 8.5,
+    'natal super strength': 9.5,
+    'enigma': 12.5
+}
 
-        self.base_doses = {
-            'micro': 0.2,
-            'low': 0.75,
-            'normal': 1.9,
-            'high': 3.0
-        }
+# General potency categories
+POTENCY_CATEGORIES = {
+    'mild': 5.0,      # Low potency strains
+    'standard': 7.0,  # Average potency strains  
+    'strong': 10.0    # High potency strains
+}
 
-    def get_valid_input(self, prompt, validation_func, error_msg):
-        """Get input that passes validation"""
-        while True:
-            user_input = input(prompt).strip().lower()
-            if user_input == 'quit':
-                exit()
-            try:
-                if validation_func(user_input):
-                    return user_input
-                print(Fore.RED + error_msg)
-            except:
-                print(Fore.RED + "Invalid input format")
+# Dose levels in grams (dried weight) - based on your specifications
+DOSE_LEVELS = {
+    'micro': 0.3,    # 0.1-0.5 grams dried (using middle value)
+    'low': 1.0,      # 0.5-1.5 grams dried (using middle value) 
+    'normal': 2.5,   # 2-3 grams dried (using middle value)
+    'high': 4.25     # 3.5-5 grams dried (using middle value)
+}
 
-    def get_choice(self, prompt, options, color=Fore.WHITE):
-        """Get a valid choice from options"""
-        while True:
-            choice = input(color + prompt).strip().lower()
-            if choice == 'quit':
-                exit()
-            if choice in options:
-                return choice
-            print(Fore.RED + f"Must be one of: {', '.join(options)}")
+# Conversion factors
+FRESH_TO_DRIED_RATIO = 10  # Fresh mushrooms are ~90% water
+TRUFFLE_POTENCY_FACTOR = 0.3  # Truffles are generally 30% as potent as dried mushrooms
 
-    def parse_weight(self, weight_str):
-        """Parse weight input into pounds"""
-        try:
-            parts = weight_str.split()
-            weight = float(parts[0])
-            unit = parts[1].lower() if len(parts) > 1 else 'lbs'
-            
-            if unit in ['kg', 'kilograms']:
-                return weight * 2.20462
-            return weight
-        except:
-            raise ValueError("Invalid weight format")
 
-    def print_strain_menu(self):
-        """Color-coded strain selection menu"""
-        print(f"\n{Back.BLACK}=== Available Strains ===")
-        for group, strains in self.strain_groups.items():
-            print(f"\n{Style.BRIGHT}{group} {Style.RESET_ALL}")
-            for strain, potency in strains.items():
-                peppers = '🌶' * int((potency / 0.5))
-                print(f"  {strain.replace('_', ' ').title():<15} {peppers} (x{potency})")
-
-#add it so that you can put in mild, standard or strong as an option too
-    def get_potency(self, strain):
-        """Find potency multiplier for any strain"""
-        for group in self.strain_groups.values():
-            if strain in group:
-                return group[strain]
-        return 1.0  # Default if unknown
-
-    def calculate_dose(self, weight_lbs, material, strain, dose_level):
-        """Calculate dose with color-coded warnings"""
-        base = self.base_doses[dose_level]
-        potency = self.get_potency(strain)
-        adjusted = base / potency
-
-        # Material conversion
-        if material == 'fresh':
-            adjusted *= 10
-            unit = Fore.GREEN + "grams fresh"
-        elif material == 'truffles':
-            adjusted *= 2
-            unit = Fore.CYAN + "grams truffles (dry)"
-        else:
-            unit = Fore.YELLOW + "grams dry"
-
-        # Weight adjustment (minimal)
-        if weight_lbs < 90:
-            adjusted *= 0.85
-            weight_note = Fore.BLUE + "(15% reduction for low weight)"
-        elif weight_lbs > 300:
-            adjusted *= 1.1
-            weight_note = Fore.BLUE + "(10% increase for high weight)"
-        else:
-            weight_note = ""
-
-        return max(0.05, round(adjusted, 2)), unit
+def normalize_strain_name(strain_name):
+    """
+    Normalize strain name for lookup
+    Handles spaces, capitalization, and common variations
+    """
+    if not strain_name:
+        return None
     
-    def get_potency(self, strain):
-        """Find potency multiplier for any strain (previously missing)"""
-        for group in self.strain_groups.values():
-            if strain in group:
-                return group[strain]
+    # Convert to lowercase and strip whitespace
+    normalized = strain_name.lower().strip()
+    
+    # Handle common abbreviations and variations
+    variations = {
+        'pe': 'penis envy',
+        'ape': 'albino penis envy',
+        'gt': 'golden teacher',
+        'jmf': 'jedi mind fuck',
+        'tat': 'south african transkei',
+        'gwm': 'great white monster',
+        'nss': 'natal super strength'
+    }
+    
+    if normalized in variations:
+        return variations[normalized]
+    
+    return normalized
+
+
+def get_strain_potency(strain_input):
+    """
+    Get potency value for a given strain or potency category
+    Returns potency in mg psilocybin per gram dried weight
+    """
+    if not strain_input:
+        return POTENCY_CATEGORIES['standard']
+    
+    strain_lower = strain_input.lower().strip()
+    
+    # Check if it's a potency category
+    if strain_lower in POTENCY_CATEGORIES:
+        return POTENCY_CATEGORIES[strain_lower]
+    
+    # Check if it's a specific strain
+    normalized_strain = normalize_strain_name(strain_input)
+    if normalized_strain and normalized_strain in STRAIN_POTENCIES:
+        return STRAIN_POTENCIES[normalized_strain]
+    
+    # Default to standard potency if strain not found
+    return POTENCY_CATEGORIES['standard']
+
+
+def get_weight_factor(weight_kg):
+    """
+    Calculate weight adjustment factor with bell curve
+    115-250kg: no adjustment (factor = 1.0)
+    Below 115kg: gradually decrease to 0.8 at 80kg and below
+    Above 250kg: gradually increase to 1.3 at 400kg and above
+    """
+    if 115 <= weight_kg <= 250:
         return 1.0
+    elif weight_kg < 115:
+        # Linear decrease from 1.0 at 115kg to 0.8 at 80kg
+        if weight_kg <= 80:
+            return 0.8
+        return 0.8 + (weight_kg - 80) * (1.0 - 0.8) / (115 - 80)
+    else:  # weight_kg > 250
+        # Linear increase from 1.0 at 250kg to 1.3 at 400kg
+        if weight_kg >= 400:
+            return 1.3
+        return 1.0 + (weight_kg - 250) * (1.3 - 1.0) / (400 - 250)
 
-    def format_strain_input(self, user_input):
-        """Convert user input to snake_case format"""
-        return user_input.strip().lower().replace(' ', '_')
 
-    def check_quit(self, user_input):
-        if user_input.lower().strip() == 'quit':
-            print(Fore.YELLOW + "\nSafe travels! Exiting program...")
-            exit()
-
-    def get_input_with_examples(self, prompt, options, color=Fore.WHITE):
-        """Get input with auto-formatting and clear examples"""
-        while True:
-            user_input = input(color + prompt).strip()
-            self.check_quit(user_input)
-            
-            formatted_input = self.format_strain_input(user_input)
-            
-            if formatted_input in options:
-                return formatted_input
-            
-            # Show friendly error with examples
-            print(Fore.RED + f"Invalid input. Try:")
-            print(Fore.CYAN + "Examples: " + ", ".join(
-                [f"'{x.replace('_', ' ')}'" 
-                 for x in list(options)[:3]]
-            ))
-
-    def run_interface(self):
-        print(f"\n{Back.BLUE + Fore.WHITE}=== 🍄 Mushroom Calculator ==={Style.RESET_ALL}")
-        print(f"{Style.DIM}Type 'quit' anytime to exit\n")
+def calculate_dose(mushroom_type, dose_level, strain_input, weight_kg):
+    """
+    Calculate mushroom dose based on parameters
     
-        while True:
-            # Weight input (quit-proof)
-            weight_input = input("Your weight (lbs/kg): ").strip()
-            self.check_quit(weight_input)  # ✅ Exit point 1
-        
-            try:
-                weight_lbs = self.parse_weight(weight_input)
-                if not 50 < weight_lbs < 500:
-                    print(Fore.RED + "Please enter between 50-500 lbs/kg")
-                    continue
-                
-            except ValueError:
-                print(Fore.RED + "Examples: '150 lbs' or '68 kg'")
-                continue
+    Args:
+        mushroom_type: 'fresh', 'dried', or 'truffles'
+        dose_level: 'micro', 'low', 'normal', or 'high'
+        strain_input: strain name or potency category
+        weight_kg: user body weight in kilograms
+    
+    Returns:
+        dict with dose information
+    """
+    # Get base dose in grams dried
+    base_dose_dried = DOSE_LEVELS[dose_level]
+    
+    # Apply weight adjustment with bell curve
+    weight_factor = get_weight_factor(weight_kg)
+    adjusted_dose_dried = base_dose_dried * weight_factor
+    
+    # Get strain potency category for display
+    strain_potency_value = get_strain_potency(strain_input)
+    if strain_potency_value <= 6.0:
+        potency_category = 'mild'
+    elif strain_potency_value >= 9.0:
+        potency_category = 'strong'
+    else:
+        potency_category = 'standard'
+    
+    # Apply potency adjustment
+    potency_factor = strain_potency_value / POTENCY_CATEGORIES['standard']  # 7.0 is standard
+    final_dose_dried = adjusted_dose_dried * potency_factor
+    
+    # Convert based on mushroom type
+    if mushroom_type == 'fresh':
+        final_weight = final_dose_dried * FRESH_TO_DRIED_RATIO
+        weight_unit = 'grams fresh'
+    elif mushroom_type == 'dried':
+        final_weight = final_dose_dried
+        weight_unit = 'grams dried'
+    elif mushroom_type == 'truffles':
+        # Truffles are less potent and measured fresh
+        final_weight = (final_dose_dried / TRUFFLE_POTENCY_FACTOR) * FRESH_TO_DRIED_RATIO
+        weight_unit = 'grams fresh truffles'
+    else:
+        raise ValueError(f"Unknown mushroom type: {mushroom_type}")
+    
+    # Determine if strain was found in database
+    normalized_strain = normalize_strain_name(strain_input)
+    strain_found = normalized_strain and normalized_strain in STRAIN_POTENCIES
+    
+    return {
+        'dose_grams': round(final_weight, 2),
+        'weight_unit': weight_unit,
+        'potency_category': potency_category,
+        'strain_found': strain_found,
+        'normalized_strain': normalized_strain or strain_input,
+        'weight_factor': round(weight_factor, 2)
+    }
 
-            # Material type
-            material = self.get_input_with_examples(
-                "Material type [fresh/dry/truffles]: ",
-                ['fresh', 'dry', 'truffles'],
-                Fore.MAGENTA
-            )
 
-            # Strain selection
-            self.print_strain_menu()
-            all_strains = [s for group in self.strain_groups.values() for s in group]
-            strain = self.get_input_with_examples(
-                "Select strain: ",
-                all_strains,
-                Fore.GREEN
-            )
+def get_available_strains():
+    """
+    Get list of all available strains in the database
+    """
+    return sorted(STRAIN_POTENCIES.keys())
 
-            # Dose level
-            dose_level = self.get_input_with_examples(
-                "Dose level [micro/low/normal/high]: ",
-                list(self.base_doses.keys()),
-                Fore.YELLOW
-            )
 
-            # Calculate and display
-            dose, unit = self.calculate_dose(weight_lbs, material, strain, dose_level)
-            print(f"\n{Style.BRIGHT}Recommended dose: {Fore.GREEN}{dose} {unit}")
-            print(f"{Style.DIM}Strain: {strain.replace('_', ' ').title()}")
-            print("-" * 40)
+def get_dose_description(dose_level):
+    """
+    Get description for each dose level
+    """
+    descriptions = {
+        'micro': 'Sub-perceptual dose for enhanced mood and focus',
+        'low': 'Light effects, mild euphoria, enhanced creativity',
+        'normal': 'Moderate psychedelic effects, visual enhancement',
+        'high': 'Strong psychedelic experience, intense visuals'
+    }
+    return descriptions.get(dose_level, '')
 
-    # ... (Other methods like print_strain_menu, calculate_dose, etc. remain the same)
 
-if __name__ == "__main__":
-    MushroomDoseCalculator().run_interface()
+def pounds_to_kg(pounds):
+    """Convert pounds to kilograms"""
+    return pounds * 0.453592
+
+
+def kg_to_pounds(kg):
+    """Convert kilograms to pounds"""
+    return kg * 2.20462
