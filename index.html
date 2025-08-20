@@ -1,237 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>🍄 Shroomies Dose Calculator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shroomies Dosage Calculator</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 700px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: #1e1e1e;
-      color: #eee;
+    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.5; }
+    h1 { text-align: center; }
+    .section { margin-bottom: 20px; }
+    label { display: block; margin: 8px 0 4px; }
+    select, input { width: 100%; padding: 8px; margin: 4px 0; }
+    .unit-toggle {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
     }
-    h1, h3 { text-align: center; color: #90ee90; }
-    .section { margin: 1.5rem 0; }
-    label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
-    select, input, button {
-      width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      background: #2b2b2b;
-      border: 1px solid #444;
-      color: #eee;
-      border-radius: 6px;
-    }
-    button {
-      background: #4caf50;
-      color: white;
-      border: none;
+    .unit-button {
+      padding: 6px 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
       cursor: pointer;
     }
-    button:hover { background: #45a049; }
-    .result {
-      background: #2b2b2b;
-      border: 1px solid #444;
-      padding: 1rem;
-      border-radius: 6px;
+    .unit-button.active {
+      background: #4CAF50;
+      color: white;
     }
-    .advice { margin-top: 1rem; }
-    .footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #aaa;
+    #result { font-weight: bold; margin-top: 15px; }
+    footer {
+      margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;
+      font-size: 0.9em; color: #555;
     }
-    .toggle { display: inline-block; margin: 0 0.5rem; cursor: pointer; }
   </style>
 </head>
 <body>
-  <h1>🍄 Shroomies Dose Calculator</h1>
-  <div style="text-align:center; margin-bottom:1rem;">
-    <span class="toggle" onclick="setLanguage('en')">🇺🇸 English</span> | 
-    <span class="toggle" onclick="setLanguage('es')">🇵🇷 Español</span>
+  <h1>🍄 Shroomies Dosage Calculator</h1>
+
+  <!-- Welcome Section -->
+  <div class="section" id="welcome">
+    <h2 data-en="Welcome" data-es="Bienvenido">Welcome</h2>
+    <p data-en="I’m so excited to help you on your journey. Here are some suggestions on how to calculate the appropriate dose for you. Everyone is different. This is not medical advice. This is for educational purposes only. It is very important to know yourself and to have safety guards in mind when building a relationship with this plant. For more information, read here."
+       data-es="Estoy muy emocionado de ayudarte en tu camino. Aquí tienes algunas sugerencias sobre cómo calcular la dosis adecuada para ti. Cada persona es diferente. Esto no es consejo médico. Es solo con fines educativos. Es muy importante conocerte a ti mismo y tener precauciones en mente al construir una relación con esta planta. Para más información, lee aquí.">
+       I’m so excited to help you on your journey. ...
+    </p>
   </div>
 
+  <!-- Weight Section -->
   <div class="section">
-    <label id="weightLabel">Body Weight</label>
-    <input type="number" id="weight" placeholder="Enter your weight">
-    <div>
-      <label><input type="radio" name="unit" value="kg" checked> kg</label>
-      <label><input type="radio" name="unit" value="lb"> lb</label>
+    <label for="weight" data-en="Enter your weight:" data-es="Ingresa tu peso:">Enter your weight:</label>
+    <input type="number" id="weight" placeholder="Enter your weight" />
+
+    <!-- Toggle buttons -->
+    <div class="unit-toggle">
+      <div id="kgBtn" class="unit-button active">kg</div>
+      <div id="lbBtn" class="unit-button">lbs</div>
     </div>
   </div>
 
+  <!-- Mushroom Category Section -->
   <div class="section">
-    <label id="strainLabel">Strain</label>
-    <select id="strain">
-      <option value="mild">Mild (low potency)</option>
-      <option value="standard">Standard (average potency)</option>
-      <option value="strong">Strong (high potency)</option>
-      <optgroup label="Specific strains">
-        <option value="puerto rican">Puerto Rican</option>
-        <option value="golden teacher">Golden Teacher</option>
-        <option value="penis envy">Penis Envy</option>
-        <option value="albino penis envy">Albino Penis Envy</option>
-        <option value="blue meanie">Blue Meanie</option>
-        <!-- add more as needed -->
-      </optgroup>
+    <label for="mushroom" data-en="Choose your mushroom type:" data-es="Elige tu tipo de hongo:">Choose your mushroom type:</label>
+    <select id="mushroom" style="font-size: 1em; padding: 10px;">
+      <option value="cubensis">Psilocybe cubensis</option>
+      <option value="mexicana">Psilocybe mexicana</option>
+      <option value="azurescens">Psilocybe azurescens</option>
+      <option value="cyanescens">Psilocybe cyanescens</option>
+      <option value="semilanceata">Psilocybe semilanceata</option>
+      <option value="tampanensis">Psilocybe tampanensis (truffles)</option>
     </select>
   </div>
 
+  <!-- Intensity Section -->
   <div class="section">
-    <label id="effectLabel">Effect Level</label>
-    <select id="effect">
+    <label for="intensity" data-en="Choose your intensity:" data-es="Elige la intensidad:">Choose your intensity:</label>
+    <select id="intensity" style="font-size: 1em; padding: 10px;">
       <option value="micro">Microdose</option>
-      <option value="light">Light</option>
-      <option value="common">Common</option>
-      <option value="strong">Strong</option>
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
       <option value="heroic">Heroic</option>
     </select>
   </div>
 
+  <!-- Result -->
+  <div id="result"></div>
+
+  <!-- Translation Toggle -->
   <div class="section">
-    <label id="formLabel">Mushroom Form</label>
-    <select id="form">
-      <option value="dried">Dried mushrooms</option>
-      <option value="fresh">Fresh mushrooms</option>
-      <option value="truffles">Truffles</option>
-    </select>
+    <button onclick="toggleLanguage()">🌐 English / Español</button>
   </div>
 
-  <button onclick="calculateDose()">Calculate Dose</button>
-
-  <div id="output" class="result" style="display:none;"></div>
-
-  <div class="footer">
-    🍄 Shroomies Calculator | For educational purposes only<br>
-    Always research thoroughly and prioritize safety
-  </div>
+  <footer>
+    <p data-en="⚠️ Disclaimer: This tool is for educational purposes only and should not be considered medical advice."
+       data-es="⚠️ Aviso: Esta herramienta es solo con fines educativos y no debe considerarse consejo médico.">
+       ⚠️ Disclaimer: This tool is for educational purposes only...
+    </p>
+  </footer>
 
   <script>
-    // Potency (mg psilocybin / g dried)
-    const STRAIN_POTENCIES = {
-      "puerto rican": 7.0,
-      "golden teacher": 6.0,
-      "penis envy": 11.0,
-      "albino penis envy": 12.0,
-      "blue meanie": 9.0
-    };
-
-    // Experience dose guidelines (grams dried, average strain, 70kg person)
-    const BASE_DOSES = {
-      micro: 0.2,
-      light: 1.0,
-      common: 2.0,
-      strong: 3.5,
-      heroic: 5.0
-    };
-
-    // Form multipliers
-    const FORM_MULTIPLIER = {
-      dried: 1.0,
-      fresh: 10.0,   // fresh mushrooms ~10x heavier than dried
-      truffles: 1.5  // truffles weaker, so require more
-    };
-
-    // Language translations
-    const TRANSLATIONS = {
-      en: {
-        weight: "Body Weight",
-        strain: "Strain",
-        effect: "Effect Level",
-        form: "Mushroom Form",
-        micro: "Microdose",
-        light: "Light",
-        common: "Common",
-        strong: "Strong",
-        heroic: "Heroic",
-        dried: "Dried mushrooms",
-        fresh: "Fresh mushrooms",
-        truffles: "Truffles",
-        advice: "Additional Advice"
-      },
-      es: {
-        weight: "Peso corporal",
-        strain: "Variedad",
-        effect: "Nivel de efecto",
-        form: "Forma del hongo",
-        micro: "Microdosis",
-        light: "Ligero",
-        common: "Común",
-        strong: "Fuerte",
-        heroic: "Heroico",
-        dried: "Hongos secos",
-        fresh: "Hongos frescos",
-        truffles: "Trufas",
-        advice: "Consejos adicionales"
-      }
-    };
-
+    let currentUnit = "kg";
     let currentLang = "en";
 
-    function setLanguage(lang) {
-      currentLang = lang;
-      document.getElementById("weightLabel").innerText = TRANSLATIONS[lang].weight;
-      document.getElementById("strainLabel").innerText = TRANSLATIONS[lang].strain;
-      document.getElementById("effectLabel").innerText = TRANSLATIONS[lang].effect;
-      document.getElementById("formLabel").innerText = TRANSLATIONS[lang].form;
+    document.getElementById("kgBtn").addEventListener("click", () => switchUnit("kg"));
+    document.getElementById("lbBtn").addEventListener("click", () => switchUnit("lbs"));
 
-      const effect = document.getElementById("effect");
-      effect.options[0].text = TRANSLATIONS[lang].micro;
-      effect.options[1].text = TRANSLATIONS[lang].light;
-      effect.options[2].text = TRANSLATIONS[lang].common;
-      effect.options[3].text = TRANSLATIONS[lang].strong;
-      effect.options[4].text = TRANSLATIONS[lang].heroic;
-
-      const form = document.getElementById("form");
-      form.options[0].text = TRANSLATIONS[lang].dried;
-      form.options[1].text = TRANSLATIONS[lang].fresh;
-      form.options[2].text = TRANSLATIONS[lang].truffles;
+    function switchUnit(unit) {
+      currentUnit = unit;
+      document.getElementById("kgBtn").classList.toggle("active", unit === "kg");
+      document.getElementById("lbBtn").classList.toggle("active", unit === "lbs");
+      calculate();
     }
 
-    function calculateDose() {
+    document.getElementById("weight").addEventListener("input", calculate);
+    document.getElementById("mushroom").addEventListener("change", calculate);
+    document.getElementById("intensity").addEventListener("change", calculate);
+
+    function calculate() {
       let weight = parseFloat(document.getElementById("weight").value);
-      let unit = document.querySelector('input[name="unit"]:checked').value;
-      let strain = document.getElementById("strain").value;
-      let effect = document.getElementById("effect").value;
-      let form = document.getElementById("form").value;
+      if (isNaN(weight)) { document.getElementById("result").textContent = ""; return; }
 
-      if (unit === "lb") weight = weight * 0.453592; // convert lb to kg
+      if (currentUnit === "lbs") weight /= 2.20462; // convert lbs to kg
 
-      // base grams for 70kg at average potency
-      let base = BASE_DOSES[effect];
-      let dose = base * (weight / 70);
+      let mushroom = document.getElementById("mushroom").value;
+      let intensity = document.getElementById("intensity").value;
 
-      // adjust for strain potency if chosen
-      if (strain in STRAIN_POTENCIES) {
-        let ratio = 6.0 / STRAIN_POTENCIES[strain]; // normalize vs avg 6mg/g
-        dose = dose * ratio;
-      } else if (strain === "mild") {
-        dose *= 1.2;
-      } else if (strain === "strong") {
-        dose *= 0.8;
-      }
+      // basic multipliers (these can be tuned)
+      let intensityFactors = { micro: 0.1, low: 0.3, medium: 0.6, high: 1.2, heroic: 2.5 };
+      let potency = { cubensis: 1, mexicana: 0.8, azurescens: 2, cyanescens: 1.8, semilanceata: 1.5, tampanensis: 0.7 };
 
-      // adjust for form
-      dose *= FORM_MULTIPLIER[form];
+      let grams = weight * 0.03 * intensityFactors[intensity] * potency[mushroom];
 
-      const output = document.getElementById("output");
-      output.style.display = "block";
-      output.innerHTML = `
-        <h3>Recommended Dose</h3>
-        <p><strong>${dose.toFixed(2)} g</strong> of ${form} <em>${strain}</em></p>
-        <p><em>${TRANSLATIONS[currentLang][effect]}</em> ${TRANSLATIONS[currentLang].effect}</p>
-        <details class="advice">
-          <summary>${TRANSLATIONS[currentLang].advice}</summary>
-          <p><strong>Start time:</strong> Effects typically begin 20–60 minutes after consumption<br>
-          <strong>Duration:</strong> 6–10 hours<br>
-          <strong>Setting:</strong> Ensure you're in a safe, comfortable environment<br>
-          <strong>Integration:</strong> Consider journaling afterwards<br>
-          <strong>Safety:</strong> Start low if inexperienced, have a trusted person nearby, stay hydrated, avoid risky combinations</p>
-        </details>
-      `;
+      document.getElementById("result").textContent =
+        (currentLang === "en" ? "Recommended dose: " : "Dosis recomendada: ") +
+        grams.toFixed(2) + " g (" + mushroom + ")";
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === "en" ? "es" : "en";
+      document.querySelectorAll("[data-en]").forEach(el => {
+        el.textContent = el.getAttribute(`data-${currentLang}`);
+      });
+      calculate();
     }
   </script>
 </body>
