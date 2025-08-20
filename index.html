@@ -1,148 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shroomies Dosage Calculator</title>
+  <meta charset="UTF-8">
+  <title>🍄 Shroomies Dose Calculator</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.5; }
-    h1 { text-align: center; }
-    .section { margin-bottom: 20px; }
-    label { display: block; margin: 8px 0 4px; }
-    select, input { width: 100%; padding: 8px; margin: 4px 0; }
-    .unit-toggle {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-top: 8px;
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #1e1e1e;
+      color: #eee;
+      transition: background 0.3s, color 0.3s;
     }
-    .unit-button {
-      padding: 6px 12px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      cursor: pointer;
+    h1, h3 { text-align: center; color: #90ee90; }
+    .section { margin: 1.5rem 0; }
+    label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+    select, input, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      background: #2b2b2b;
+      border: 1px solid #444;
+      color: #eee;
+      border-radius: 8px;
+      font-size: 1rem;
     }
-    .unit-button.active {
-      background: #4CAF50;
+    button {
+      background: #4caf50;
       color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
     }
-    #result { font-weight: bold; margin-top: 15px; }
-    footer {
-      margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;
-      font-size: 0.9em; color: #555;
+    button:hover { background: #45a049; }
+    .result {
+      background: #2b2b2b;
+      border: 1px solid #444;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .advice { margin-top: 1rem; }
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    .toggle { display: inline-block; margin: 0 0.5rem; cursor: pointer; }
+
+    /* Light mode */
+    body.light {
+      background: #f9f9f9;
+      color: #222;
+    }
+    body.light select,
+    body.light input,
+    body.light .result {
+      background: #fff;
+      color: #222;
+      border: 1px solid #ccc;
+    }
+    body.light button {
+      background: #0077cc;
+    }
+    body.light h1, body.light h3 {
+      color: #0077cc;
     }
   </style>
 </head>
 <body>
-  <h1>🍄 Shroomies Dosage Calculator</h1>
-
-  <!-- Welcome Section -->
-  <div class="section" id="welcome">
-    <h2 data-en="Welcome" data-es="Bienvenido">Welcome</h2>
-    <p data-en="I’m so excited to help you on your journey. Here are some suggestions on how to calculate the appropriate dose for you. Everyone is different. This is not medical advice. This is for educational purposes only. It is very important to know yourself and to have safety guards in mind when building a relationship with this plant. For more information, read here."
-       data-es="Estoy muy emocionado de ayudarte en tu camino. Aquí tienes algunas sugerencias sobre cómo calcular la dosis adecuada para ti. Cada persona es diferente. Esto no es consejo médico. Es solo con fines educativos. Es muy importante conocerte a ti mismo y tener precauciones en mente al construir una relación con esta planta. Para más información, lee aquí.">
-       I’m so excited to help you on your journey. ...
-    </p>
+  <h1>🍄 Shroomies Dose Calculator</h1>
+  <div style="text-align:center; margin-bottom:1rem;">
+    <span class="toggle" onclick="setLanguage('en')">🇺🇸 English</span> | 
+    <span class="toggle" onclick="setLanguage('es')">🇵🇷 Español</span> | 
+    <span class="toggle" onclick="toggleTheme()">🌓 Theme</span>
   </div>
 
-  <!-- Weight Section -->
   <div class="section">
-    <label for="weight" data-en="Enter your weight:" data-es="Ingresa tu peso:">Enter your weight:</label>
-    <input type="number" id="weight" placeholder="Enter your weight" />
-
-    <!-- Toggle buttons -->
-    <div class="unit-toggle">
-      <div id="kgBtn" class="unit-button active">kg</div>
-      <div id="lbBtn" class="unit-button">lbs</div>
+    <label id="weightLabel">Body Weight</label>
+    <input type="number" id="weight" placeholder="Enter your weight">
+    <div>
+      <label><input type="radio" name="unit" value="kg" checked> kg</label>
+      <label><input type="radio" name="unit" value="lb"> lb</label>
     </div>
   </div>
 
-  <!-- Mushroom Category Section -->
   <div class="section">
-    <label for="mushroom" data-en="Choose your mushroom type:" data-es="Elige tu tipo de hongo:">Choose your mushroom type:</label>
-    <select id="mushroom" style="font-size: 1em; padding: 10px;">
-      <option value="cubensis">Psilocybe cubensis</option>
-      <option value="mexicana">Psilocybe mexicana</option>
-      <option value="azurescens">Psilocybe azurescens</option>
-      <option value="cyanescens">Psilocybe cyanescens</option>
-      <option value="semilanceata">Psilocybe semilanceata</option>
-      <option value="tampanensis">Psilocybe tampanensis (truffles)</option>
+    <label id="strainLabel">Strain</label>
+    <select id="strain">
+      <option value="mild">Mild (low potency)</option>
+      <option value="standard">Standard (average potency)</option>
+      <option value="strong">Strong (high potency)</option>
+      <optgroup label="Specific strains">
+        <option value="puerto rican">Puerto Rican</option>
+        <option value="golden teacher">Golden Teacher</option>
+        <option value="penis envy">Penis Envy</option>
+        <option value="albino penis envy">Albino Penis Envy</option>
+        <option value="blue meanie">Blue Meanie</option>
+      </optgroup>
     </select>
   </div>
 
-  <!-- Intensity Section -->
   <div class="section">
-    <label for="intensity" data-en="Choose your intensity:" data-es="Elige la intensidad:">Choose your intensity:</label>
-    <select id="intensity" style="font-size: 1em; padding: 10px;">
+    <label id="effectLabel">Effect Level</label>
+    <select id="effect">
       <option value="micro">Microdose</option>
-      <option value="low">Low</option>
-      <option value="medium">Medium</option>
-      <option value="high">High</option>
-      <option value="heroic">Heroic</option>
-    </select>
-  </div>
-
-  <!-- Result -->
-  <div id="result"></div>
-
-  <!-- Translation Toggle -->
-  <div class="section">
-    <button onclick="toggleLanguage()">🌐 English / Español</button>
-  </div>
-
-  <footer>
-    <p data-en="⚠️ Disclaimer: This tool is for educational purposes only and should not be considered medical advice."
-       data-es="⚠️ Aviso: Esta herramienta es solo con fines educativos y no debe considerarse consejo médico.">
-       ⚠️ Disclaimer: This tool is for educational purposes only...
-    </p>
-  </footer>
-
-  <script>
-    let currentUnit = "kg";
-    let currentLang = "en";
-
-    document.getElementById("kgBtn").addEventListener("click", () => switchUnit("kg"));
-    document.getElementById("lbBtn").addEventListener("click", () => switchUnit("lbs"));
-
-    function switchUnit(unit) {
-      currentUnit = unit;
-      document.getElementById("kgBtn").classList.toggle("active", unit === "kg");
-      document.getElementById("lbBtn").classList.toggle("active", unit === "lbs");
-      calculate();
-    }
-
-    document.getElementById("weight").addEventListener("input", calculate);
-    document.getElementById("mushroom").addEventListener("change", calculate);
-    document.getElementById("intensity").addEventListener("change", calculate);
-
-    function calculate() {
-      let weight = parseFloat(document.getElementById("weight").value);
-      if (isNaN(weight)) { document.getElementById("result").textContent = ""; return; }
-
-      if (currentUnit === "lbs") weight /= 2.20462; // convert lbs to kg
-
-      let mushroom = document.getElementById("mushroom").value;
-      let intensity = document.getElementById("intensity").value;
-
-      // basic multipliers (these can be tuned)
-      let intensityFactors = { micro: 0.1, low: 0.3, medium: 0.6, high: 1.2, heroic: 2.5 };
-      let potency = { cubensis: 1, mexicana: 0.8, azurescens: 2, cyanescens: 1.8, semilanceata: 1.5, tampanensis: 0.7 };
-
-      let grams = weight * 0.03 * intensityFactors[intensity] * potency[mushroom];
-
-      document.getElementById("result").textContent =
-        (currentLang === "en" ? "Recommended dose: " : "Dosis recomendada: ") +
-        grams.toFixed(2) + " g (" + mushroom + ")";
-    }
-
-    function toggleLanguage() {
-      currentLang = currentLang === "en" ? "es" : "en";
-      document.querySelectorAll("[data-en]").forEach(el => {
-        el.textContent = el.getAttribute(`data-${currentLang}`);
-      });
-      calculate();
-    }
-  </script>
-</body>
-</html>
+      <option va
