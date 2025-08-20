@@ -106,4 +106,159 @@
     <label id="effectLabel">Effect Level</label>
     <select id="effect">
       <option value="micro">Microdose</option>
-      <option va
+      <option value="light">Light</option>
+      <option value="common">Common</option>
+      <option value="strong">Strong</option>
+      <option value="heroic">Heroic</option>
+    </select>
+  </div>
+
+  <div class="section">
+    <label id="formLabel">Mushroom Form</label>
+    <select id="form">
+      <option value="dried">Dried mushrooms</option>
+      <option value="fresh">Fresh mushrooms</option>
+      <option value="truffles">Truffles</option>
+    </select>
+  </div>
+
+  <button onclick="calculateDose()">Calculate Dose</button>
+
+  <div id="output" class="result" style="display:none;"></div>
+
+  <div class="footer">
+    🍄 Shroomies Calculator | For educational purposes only<br>
+    Always research thoroughly and prioritize safety
+  </div>
+
+  <script>
+    // Potency (mg psilocybin / g dried)
+    const STRAIN_POTENCIES = {
+      "puerto rican": 7.0,
+      "golden teacher": 6.0,
+      "penis envy": 11.0,
+      "albino penis envy": 12.0,
+      "blue meanie": 9.0
+    };
+
+    // Experience dose guidelines (grams dried, average strain, 70kg person)
+    const BASE_DOSES = {
+      micro: 0.2,
+      light: 1.0,
+      common: 2.0,
+      strong: 3.5,
+      heroic: 5.0
+    };
+
+    // Form multipliers
+    const FORM_MULTIPLIER = {
+      dried: 1.0,
+      fresh: 10.0,   // fresh mushrooms ~10x heavier than dried
+      truffles: (10 / 3.5) // adjust so a "strong" dose = ~10g truffles instead of 3.5
+    };
+
+    // Language translations
+    const TRANSLATIONS = {
+      en: {
+        weight: "Body Weight",
+        strain: "Strain",
+        effect: "Effect Level",
+        form: "Mushroom Form",
+        micro: "Microdose",
+        light: "Light",
+        common: "Common",
+        strong: "Strong",
+        heroic: "Heroic",
+        dried: "Dried mushrooms",
+        fresh: "Fresh mushrooms",
+        truffles: "Truffles",
+        advice: "Additional Advice"
+      },
+      es: {
+        weight: "Peso corporal",
+        strain: "Variedad",
+        effect: "Nivel de efecto",
+        form: "Forma del hongo",
+        micro: "Microdosis",
+        light: "Ligero",
+        common: "Común",
+        strong: "Fuerte",
+        heroic: "Heroico",
+        dried: "Hongos secos",
+        fresh: "Hongos frescos",
+        truffles: "Trufas",
+        advice: "Consejos adicionales"
+      }
+    };
+
+    let currentLang = "en";
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById("weightLabel").innerText = TRANSLATIONS[lang].weight;
+      document.getElementById("strainLabel").innerText = TRANSLATIONS[lang].strain;
+      document.getElementById("effectLabel").innerText = TRANSLATIONS[lang].effect;
+      document.getElementById("formLabel").innerText = TRANSLATIONS[lang].form;
+
+      const effect = document.getElementById("effect");
+      effect.options[0].text = TRANSLATIONS[lang].micro;
+      effect.options[1].text = TRANSLATIONS[lang].light;
+      effect.options[2].text = TRANSLATIONS[lang].common;
+      effect.options[3].text = TRANSLATIONS[lang].strong;
+      effect.options[4].text = TRANSLATIONS[lang].heroic;
+
+      const form = document.getElementById("form");
+      form.options[0].text = TRANSLATIONS[lang].dried;
+      form.options[1].text = TRANSLATIONS[lang].fresh;
+      form.options[2].text = TRANSLATIONS[lang].truffles;
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+    }
+
+    function calculateDose() {
+      let weight = parseFloat(document.getElementById("weight").value);
+      let unit = document.querySelector('input[name="unit"]:checked').value;
+      let strain = document.getElementById("strain").value;
+      let effect = document.getElementById("effect").value;
+      let form = document.getElementById("form").value;
+
+      if (unit === "lb") weight = weight * 0.453592; // convert lb to kg
+
+      // base grams for 70kg at average potency
+      let base = BASE_DOSES[effect];
+      let dose = base * (weight / 70);
+
+      // adjust for strain potency if chosen
+      if (strain in STRAIN_POTENCIES) {
+        let ratio = 6.0 / STRAIN_POTENCIES[strain]; // normalize vs avg 6mg/g
+        dose = dose * ratio;
+      } else if (strain === "mild") {
+        dose *= 1.2;
+      } else if (strain === "strong") {
+        dose *= 0.8;
+      }
+
+      // adjust for form
+      dose *= FORM_MULTIPLIER[form];
+
+      const output = document.getElementById("output");
+      output.style.display = "block";
+      output.innerHTML = `
+        <h3>Recommended Dose</h3>
+        <p><strong>${dose.toFixed(2)} g</strong> of ${form} <em>${strain}</em></p>
+        <p><em>${TRANSLATIONS[currentLang][effect]}</em> ${TRANSLATIONS[currentLang].effect}</p>
+        <details class="advice">
+          <summary>${TRANSLATIONS[currentLang].advice}</summary>
+          <p><strong>Start time:</strong> Effects typically begin 20–60 minutes after consumption<br>
+          <strong>Duration:</strong> 6–10 hours<br>
+          <strong>Setting:</strong> Ensure you're in a safe, comfortable environment<br>
+          <strong>Integration:</strong> Consider journaling afterwards<br>
+          <strong>Safety:</strong> Start low if inexperienced, have a trusted person nearby, stay hydrated, avoid risky combinations</p>
+        </details>
+      `;
+    }
+  </script>
+</body>
+</html>
