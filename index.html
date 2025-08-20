@@ -49,9 +49,46 @@
     }
     .toggle { display: inline-block; margin: 0 0.5rem; cursor: pointer; }
 
-    /* Light mode */
+    /* Toggle switch for weight units */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      margin: 0 10px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: #4caf50; }
+    input:checked + .slider:before { transform: translateX(26px); }
+    .unit-label {
+      display: inline-block;
+      font-weight: bold;
+      margin: 0 5px;
+    }
+    .active-unit { color: #90ee90; }
+
+    /* Light mode with light green background */
     body.light {
-      background: #f9f9f9;
+      background: #e6f7e6;
       color: #222;
     }
     body.light select,
@@ -80,9 +117,13 @@
   <div class="section">
     <label id="weightLabel">Body Weight</label>
     <input type="number" id="weight" placeholder="Enter your weight">
-    <div>
-      <label><input type="radio" name="unit" value="kg" checked> kg</label>
-      <label><input type="radio" name="unit" value="lb"> lb</label>
+    <div style="display: flex; align-items: center; justify-content: center;">
+      <span id="kgLabel" class="unit-label active-unit">kg</span>
+      <label class="switch">
+        <input type="checkbox" id="unitToggle" onchange="toggleUnit()">
+        <span class="slider"></span>
+      </label>
+      <span id="lbLabel" class="unit-label">lb</span>
     </div>
   </div>
 
@@ -95,9 +136,25 @@
       <optgroup label="Specific strains">
         <option value="puerto rican">Puerto Rican</option>
         <option value="golden teacher">Golden Teacher</option>
+        <option value="b+">B+</option>
+        <option value="mazatapec">Mazatapec</option>
+        <option value="amazonian">Amazonian</option>
+        <option value="malabar">Malabar</option>
+        <option value="thai">Thai</option>
+        <option value="cambodian">Cambodian</option>
+        <option value="ecuadorian">Ecuadorian</option>
+        <option value="hawaiian">Hawaiian</option>
+        <option value="treasure coast">Treasure Coast</option>
         <option value="penis envy">Penis Envy</option>
         <option value="albino penis envy">Albino Penis Envy</option>
         <option value="blue meanie">Blue Meanie</option>
+        <option value="melmac">Melmac</option>
+        <option value="z-strain">Z-Strain</option>
+        <option value="mckennaii">McKennaii</option>
+        <option value="tidal wave">Tidal Wave</option>
+        <option value="ape">APE (Albino Penis Envy)</option>
+        <option value="jack frost">Jack Frost</option>
+        <option value="natalensis">Natalensis</option>
       </optgroup>
     </select>
   </div>
@@ -136,9 +193,25 @@
     const STRAIN_POTENCIES = {
       "puerto rican": 7.0,
       "golden teacher": 6.0,
+      "b+": 5.5,
+      "mazatapec": 6.5,
+      "amazonian": 7.0,
+      "malabar": 5.0,
+      "thai": 6.0,
+      "cambodian": 6.0,
+      "ecuadorian": 6.5,
+      "hawaiian": 5.5,
+      "treasure coast": 6.0,
       "penis envy": 11.0,
       "albino penis envy": 12.0,
-      "blue meanie": 9.0
+      "blue meanie": 9.0,
+      "melmac": 10.0,
+      "z-strain": 6.5,
+      "mckennaii": 7.0,
+      "tidal wave": 10.0,
+      "ape": 12.5,
+      "jack frost": 11.0,
+      "natalensis": 8.0
     };
 
     // Experience dose guidelines (grams dried, average strain, 70kg person)
@@ -157,7 +230,7 @@
       truffles: (10 / 3.5) // adjust so a "strong" dose = ~10g truffles instead of 3.5
     };
 
-    // Language translations
+    // Language translations - Puerto Rican Spanish
     const TRANSLATIONS = {
       en: {
         weight: "Body Weight",
@@ -172,26 +245,69 @@
         dried: "Dried mushrooms",
         fresh: "Fresh mushrooms",
         truffles: "Truffles",
-        advice: "Additional Advice"
+        advice: "Additional Advice",
+        recommended: "Recommended Dose",
+        of: "of",
+        startTime: "Start time:",
+        duration: "Duration:",
+        setting: "Setting:",
+        integration: "Integration:",
+        safety: "Safety:",
+        effectsBegin: "Effects typically begin 20–60 minutes after consumption",
+        hours: "6–10 hours",
+        settingText: "Ensure you're in a safe, comfortable environment",
+        integrationText: "Consider journaling afterwards",
+        safetyText: "Start low if inexperienced, have a trusted person nearby, stay hydrated, avoid risky combinations",
+        disclaimer: "For educational purposes only. Always research thoroughly and prioritize safety"
       },
       es: {
-        weight: "Peso corporal",
+        weight: "Peso Corporal",
         strain: "Variedad",
-        effect: "Nivel de efecto",
-        form: "Forma del hongo",
+        effect: "Nivel de Efecto",
+        form: "Forma de Hongos",
         micro: "Microdosis",
-        light: "Ligero",
+        light: "Leve",
         common: "Común",
         strong: "Fuerte",
         heroic: "Heroico",
         dried: "Hongos secos",
         fresh: "Hongos frescos",
         truffles: "Trufas",
-        advice: "Consejos adicionales"
+        advice: "Consejos Adicionales",
+        recommended: "Dosis Recomendada",
+        of: "de",
+        startTime: "Tiempo de inicio:",
+        duration: "Duración:",
+        setting: "Ambiente:",
+        integration: "Integración:",
+        safety: "Seguridad:",
+        effectsBegin: "Los efectos suelen comenzar entre 20 y 60 minutos después del consumo",
+        hours: "6–10 horas",
+        settingText: "Asegúrate de estar en un ambiente seguro y cómodo",
+        integrationText: "Considera escribir un diario después de la experiencia",
+        safetyText: "Comienza con dosis bajas si eres inexperto, ten a alguien de confianza cerca, mantente hidratado, evita combinaciones riesgosas",
+        disclaimer: "Solo con fines educativos. Investiga bien y prioriza tu seguridad siempre"
       }
     };
 
     let currentLang = "en";
+    let currentUnit = "kg";
+
+    function toggleUnit() {
+      const toggle = document.getElementById("unitToggle");
+      const kgLabel = document.getElementById("kgLabel");
+      const lbLabel = document.getElementById("lbLabel");
+      
+      if (toggle.checked) {
+        currentUnit = "lb";
+        kgLabel.classList.remove("active-unit");
+        lbLabel.classList.add("active-unit");
+      } else {
+        currentUnit = "kg";
+        kgLabel.classList.add("active-unit");
+        lbLabel.classList.remove("active-unit");
+      }
+    }
 
     function setLanguage(lang) {
       currentLang = lang;
@@ -211,6 +327,9 @@
       form.options[0].text = TRANSLATIONS[lang].dried;
       form.options[1].text = TRANSLATIONS[lang].fresh;
       form.options[2].text = TRANSLATIONS[lang].truffles;
+      
+      // Update footer text
+      document.querySelector(".footer").innerHTML = `🍄 Shroomies Calculator | ${TRANSLATIONS[lang].disclaimer}`;
     }
 
     function toggleTheme() {
@@ -219,12 +338,12 @@
 
     function calculateDose() {
       let weight = parseFloat(document.getElementById("weight").value);
-      let unit = document.querySelector('input[name="unit"]:checked').value;
       let strain = document.getElementById("strain").value;
       let effect = document.getElementById("effect").value;
       let form = document.getElementById("form").value;
 
-      if (unit === "lb") weight = weight * 0.453592; // convert lb to kg
+      // Convert weight to kg if needed
+      if (currentUnit === "lb") weight = weight * 0.453592;
 
       // base grams for 70kg at average potency
       let base = BASE_DOSES[effect];
@@ -246,16 +365,16 @@
       const output = document.getElementById("output");
       output.style.display = "block";
       output.innerHTML = `
-        <h3>Recommended Dose</h3>
-        <p><strong>${dose.toFixed(2)} g</strong> of ${form} <em>${strain}</em></p>
+        <h3>${TRANSLATIONS[currentLang].recommended}</h3>
+        <p><strong>${dose.toFixed(2)} g</strong> ${TRANSLATIONS[currentLang].of} ${TRANSLATIONS[currentLang][form]} <em>${strain}</em></p>
         <p><em>${TRANSLATIONS[currentLang][effect]}</em> ${TRANSLATIONS[currentLang].effect}</p>
         <details class="advice">
           <summary>${TRANSLATIONS[currentLang].advice}</summary>
-          <p><strong>Start time:</strong> Effects typically begin 20–60 minutes after consumption<br>
-          <strong>Duration:</strong> 6–10 hours<br>
-          <strong>Setting:</strong> Ensure you're in a safe, comfortable environment<br>
-          <strong>Integration:</strong> Consider journaling afterwards<br>
-          <strong>Safety:</strong> Start low if inexperienced, have a trusted person nearby, stay hydrated, avoid risky combinations</p>
+          <p><strong>${TRANSLATIONS[currentLang].startTime}</strong> ${TRANSLATIONS[currentLang].effectsBegin}<br>
+          <strong>${TRANSLATIONS[currentLang].duration}</strong> ${TRANSLATIONS[currentLang].hours}<br>
+          <strong>${TRANSLATIONS[currentLang].setting}</strong> ${TRANSLATIONS[currentLang].settingText}<br>
+          <strong>${TRANSLATIONS[currentLang].integration}</strong> ${TRANSLATIONS[currentLang].integrationText}<br>
+          <strong>${TRANSLATIONS[currentLang].safety}</strong> ${TRANSLATIONS[currentLang].safetyText}</p>
         </details>
       `;
     }
