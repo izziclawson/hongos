@@ -49,6 +49,35 @@
     }
     .toggle { display: inline-block; margin: 0 0.5rem; cursor: pointer; }
 
+    /* Header section */
+    .header {
+      background: #2b2b2b;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    /* Disclaimer section */
+    .disclaimer {
+      margin-top: 1.5rem;
+      background: #2b2b2b;
+      border: 1px solid #444;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .disclaimer summary {
+      cursor: pointer;
+      font-weight: bold;
+      color: #90ee90;
+    }
+    .disclaimer-content {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid #444;
+    }
+
     /* Toggle switch for weight units */
     .switch {
       position: relative;
@@ -91,6 +120,10 @@
       background: #e6f7e6;
       color: #222;
     }
+    body.light .header,
+    body.light .disclaimer {
+      background: #d0f0d0;
+    }
     body.light select,
     body.light input,
     body.light .result {
@@ -104,6 +137,9 @@
     body.light h1, body.light h3 {
       color: #0077cc;
     }
+    body.light .disclaimer summary {
+      color: #0077cc;
+    }
   </style>
 </head>
 <body>
@@ -112,6 +148,10 @@
     <span class="toggle" onclick="setLanguage('en')">🇺🇸 English</span> | 
     <span class="toggle" onclick="setLanguage('es')">🇵🇷 Español</span> | 
     <span class="toggle" onclick="toggleTheme()">🌓 Theme</span>
+  </div>
+
+  <div class="header">
+    <p id="welcomeText">I'm excited to help you on your journey! This calculator provides personalized dosage recommendations based on your weight, strain potency, and desired experience level.</p>
   </div>
 
   <div class="section">
@@ -131,7 +171,7 @@
     <label id="strainLabel">Strain</label>
     <select id="strain">
       <option value="mild">Mild (low potency)</option>
-      <option value="standard">Standard (average potency)</option>
+      <option value="standard" selected>Standard (average potency)</option>
       <option value="strong">Strong (high potency)</option>
       <optgroup label="Specific strains">
         <option value="puerto rican">Puerto Rican</option>
@@ -162,18 +202,18 @@
   <div class="section">
     <label id="effectLabel">Effect Level</label>
     <select id="effect">
-      <option value="micro">Microdose</option>
-      <option value="light">Light</option>
-      <option value="common">Common</option>
-      <option value="strong">Strong</option>
-      <option value="heroic">Heroic</option>
+      <option value="micro">Microdose (0.1-0.5g)</option>
+      <option value="light">Light (0.5-1.5g)</option>
+      <option value="common" selected>Common (1.5-3.5g)</option>
+      <option value="strong">Strong (3.5-5g)</option>
+      <option value="heroic">Heroic (5g+)</option>
     </select>
   </div>
 
   <div class="section">
     <label id="formLabel">Mushroom Form</label>
     <select id="form">
-      <option value="dried">Dried mushrooms</option>
+      <option value="dried" selected>Dried mushrooms</option>
       <option value="fresh">Fresh mushrooms</option>
       <option value="truffles">Truffles</option>
     </select>
@@ -182,6 +222,15 @@
   <button onclick="calculateDose()">Calculate Dose</button>
 
   <div id="output" class="result" style="display:none;"></div>
+
+  <div class="disclaimer">
+    <details>
+      <summary id="disclaimerTitle">Important Disclaimer</summary>
+      <div class="disclaimer-content" id="disclaimerContent">
+        This calculator is for educational purposes only. Always consult with a healthcare professional before consuming psychedelic substances, especially if you have pre-existing medical conditions. Your environment plays a significant role in your experience. For more information about safe usage and considerations, please visit our website.
+      </div>
+    </details>
+  </div>
 
   <div class="footer">
     🍄 Shroomies Calculator | For educational purposes only<br>
@@ -214,9 +263,9 @@
       "natalensis": 8.0
     };
 
-    // Experience dose guidelines (grams dried, average strain, 70kg person)
+    // Base doses for a 150lb (68kg) person
     const BASE_DOSES = {
-      micro: 0.2,
+      micro: 0.25,
       light: 1.0,
       common: 2.0,
       strong: 3.5,
@@ -233,15 +282,16 @@
     // Language translations - Puerto Rican Spanish
     const TRANSLATIONS = {
       en: {
+        welcome: "I'm excited to help you on your journey! This calculator provides personalized dosage recommendations based on your weight, strain potency, and desired experience level.",
         weight: "Body Weight",
         strain: "Strain",
         effect: "Effect Level",
         form: "Mushroom Form",
-        micro: "Microdose",
-        light: "Light",
-        common: "Common",
-        strong: "Strong",
-        heroic: "Heroic",
+        micro: "Microdose (0.1-0.5g)",
+        light: "Light (0.5-1.5g)",
+        common: "Common (1.5-3.5g)",
+        strong: "Strong (3.5-5g)",
+        heroic: "Heroic (5g+)",
         dried: "Dried mushrooms",
         fresh: "Fresh mushrooms",
         truffles: "Truffles",
@@ -258,18 +308,21 @@
         settingText: "Ensure you're in a safe, comfortable environment",
         integrationText: "Consider journaling afterwards",
         safetyText: "Start low if inexperienced, have a trusted person nearby, stay hydrated, avoid risky combinations",
+        disclaimerTitle: "Important Disclaimer",
+        disclaimerContent: "This calculator is for educational purposes only. Always consult with a healthcare professional before consuming psychedelic substances, especially if you have pre-existing medical conditions. Your environment plays a significant role in your experience. For more information about safe usage and considerations, please visit our website.",
         disclaimer: "For educational purposes only. Always research thoroughly and prioritize safety"
       },
       es: {
+        welcome: "¡Estoy emocionado de ayudarte en tu viaje! Esta calculadora proporciona recomendaciones de dosificación personalizadas basadas en tu peso, la potencia de la cepa y el nivel de experiencia deseado.",
         weight: "Peso Corporal",
         strain: "Variedad",
         effect: "Nivel de Efecto",
         form: "Forma de Hongos",
-        micro: "Microdosis",
-        light: "Leve",
-        common: "Común",
-        strong: "Fuerte",
-        heroic: "Heroico",
+        micro: "Microdosis (0.1-0.5g)",
+        light: "Leve (0.5-1.5g)",
+        common: "Común (1.5-3.5g)",
+        strong: "Fuerte (3.5-5g)",
+        heroic: "Heroico (5g+)",
         dried: "Hongos secos",
         fresh: "Hongos frescos",
         truffles: "Trufas",
@@ -286,6 +339,8 @@
         settingText: "Asegúrate de estar en un ambiente seguro y cómodo",
         integrationText: "Considera escribir un diario después de la experiencia",
         safetyText: "Comienza con dosis bajas si eres inexperto, ten a alguien de confianza cerca, mantente hidratado, evita combinaciones riesgosas",
+        disclaimerTitle: "Descargo de Responsabilidad Importante",
+        disclaimerContent: "Esta calculadora es solo para fines educativos. Siempre consulta con un profesional de la salud antes de consumir sustancias psicodélicas, especialmente si tienes condiciones médicas preexistentes. Tu ambiente juega un papel significativo en tu experiencia. Para más información sobre uso seguro y consideraciones, por favor visita nuestro sitio web.",
         disclaimer: "Solo con fines educativos. Investiga bien y prioriza tu seguridad siempre"
       }
     };
@@ -311,10 +366,13 @@
 
     function setLanguage(lang) {
       currentLang = lang;
+      document.getElementById("welcomeText").innerText = TRANSLATIONS[lang].welcome;
       document.getElementById("weightLabel").innerText = TRANSLATIONS[lang].weight;
       document.getElementById("strainLabel").innerText = TRANSLATIONS[lang].strain;
       document.getElementById("effectLabel").innerText = TRANSLATIONS[lang].effect;
       document.getElementById("formLabel").innerText = TRANSLATIONS[lang].form;
+      document.getElementById("disclaimerTitle").innerText = TRANSLATIONS[lang].disclaimerTitle;
+      document.getElementById("disclaimerContent").innerText = TRANSLATIONS[lang].disclaimerContent;
 
       const effect = document.getElementById("effect");
       effect.options[0].text = TRANSLATIONS[lang].micro;
@@ -342,14 +400,30 @@
       let effect = document.getElementById("effect").value;
       let form = document.getElementById("form").value;
 
+      if (!weight || weight <= 0) {
+        alert(currentLang === "en" ? "Please enter a valid weight" : "Por favor ingresa un peso válido");
+        return;
+      }
+
       // Convert weight to kg if needed
       if (currentUnit === "lb") weight = weight * 0.453592;
 
-      // base grams for 70kg at average potency
+      // Base dose for a 68kg (150lb) person
       let base = BASE_DOSES[effect];
-      let dose = base * (weight / 70);
+      
+      // Adjust for weight (non-linear adjustment)
+      let weightAdjustment = 1;
+      if (weight < 68) {
+        // For lighter people, reduce dose slightly
+        weightAdjustment = 0.8 + (0.2 * (weight / 68));
+      } else if (weight > 90) {
+        // For heavier people, increase dose slightly
+        weightAdjustment = 1 + (0.2 * ((weight - 90) / 50));
+      }
+      
+      let dose = base * weightAdjustment;
 
-      // adjust for strain potency if chosen
+      // Adjust for strain potency if chosen
       if (strain in STRAIN_POTENCIES) {
         let ratio = 6.0 / STRAIN_POTENCIES[strain]; // normalize vs avg 6mg/g
         dose = dose * ratio;
@@ -359,7 +433,7 @@
         dose *= 0.8;
       }
 
-      // adjust for form
+      // Adjust for form
       dose *= FORM_MULTIPLIER[form];
 
       const output = document.getElementById("output");
@@ -367,7 +441,7 @@
       output.innerHTML = `
         <h3>${TRANSLATIONS[currentLang].recommended}</h3>
         <p><strong>${dose.toFixed(2)} g</strong> ${TRANSLATIONS[currentLang].of} ${TRANSLATIONS[currentLang][form]} <em>${strain}</em></p>
-        <p><em>${TRANSLATIONS[currentLang][effect]}</em> ${TRANSLATIONS[currentLang].effect}</p>
+        <p><em>${TRANSLATIONS[currentLang][effect.split(' ')[0]]}</em> ${TRANSLATIONS[currentLang].effect}</p>
         <details class="advice">
           <summary>${TRANSLATIONS[currentLang].advice}</summary>
           <p><strong>${TRANSLATIONS[currentLang].startTime}</strong> ${TRANSLATIONS[currentLang].effectsBegin}<br>
